@@ -249,15 +249,14 @@ int main() {
 			}
 			
 	
-                   
-		bool left = false;
-                bool right = false;
-                bool too_close = false;
+                   bool left = false;
+                    bool right = false;
+		bool too_close = false;
                     
                     
-                   
+                    // find ref_v to use
                     for (int i = 0; i < sensor_fusion.size(); i++) {
-                        // car is in the same lane
+                        // to check car is in the same lane
                         float d = sensor_fusion[i][6];
                         if (d > (4*(lane+0)) && d < (4*(lane+1))) {
                             double vx = sensor_fusion[i][3];
@@ -266,60 +265,54 @@ int main() {
                             double check_car_s = sensor_fusion[i][5];
 
                             check_car_s += ((double)prev_size*0.02*check_speed); // if using previous points can project s value out
-                            
+                            // check s values greater than mine and s gap
                             if ((check_car_s > car_s) && ((check_car_s-car_s)<30)) {
                                 // lower reference velocity so we don't crash into the car in front of us
                                 too_close = true;
                             }
                         } else if (lane != 2 && d > (4*(lane+1)) && d < (4*(lane+2))) {
-                            // check car in my right lane
+                            // to check car in right lane
                             double vx = sensor_fusion[i][3];
                             double vy = sensor_fusion[i][4];
                             double check_speed = sqrt(vx*vx+vy*vy);
                             double check_car_s = sensor_fusion[i][5];
-                            check_car_s += ((double)prev_size*0.02*check_speed); // if using previous points can project s value out
-                          
+                            check_car_s += ((double)prev_size*0.02*check_speed); 
                             
                             if ((check_car_s > (car_s - 20)) && (check_car_s < (car_s + 30))) {
-                                
                                 right = true;
                             }
                         } else if (lane != 0 && d > (4*(lane-1)) && d < (4*(lane+0))) {
-                            // check car in my left lane
+                            // to check car in left lane
                             double vx = sensor_fusion[i][3];
                             double vy = sensor_fusion[i][4];
                             double check_speed = sqrt(vx*vx+vy*vy);
                             double check_car_s = sensor_fusion[i][5];
-                            check_car_s+= ((double)prev_size*0.02*check_speed);
-                    		
+                            check_car_s += ((double)prev_size*0.02*check_speed); 
                             
                             if ((check_car_s > (car_s - 20)) && (check_car_s < (car_s + 30))) {
-                                
                                 left = true;
                             }
                         }
                     }
 
-			if (too_close)
- {
+                    if (too_close) {
                         ref_vel -= .224; // 0.5 mph
                         
-                        if (lane == 0 && !right) {
+                        if (lane == 0 && not right) {
                             lane = 1;
                         } else if (lane == 1) {
-                            if (!left) {
+                            if (not left) {
                                 lane = 0;
-                            } else if (!right) {
+                            } else if (not right) {
                                 lane = 2;
                             }
-                        } else if (lane == 2 && !left) {
+                        } else if (lane == 2 && not left) {
                             lane = 1;
                         }
                         
                     } else if (ref_vel < 49.5) {
                         ref_vel += .224;
-                    }  
-			
+                    }
 			
 			vector<double> ptsx;
 			vector<double> ptsy;
