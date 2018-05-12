@@ -248,15 +248,14 @@ int main() {
 				car_s = end_path_s;
 			}
 			
-	
-                   bool left = false;
-                    bool right = false;
-		bool too_close = false;
+		bool left_close = false;
+                    bool right_close = false;
+                 bool too_close = false;
                     
                     
-                    // find ref_v to use
+                    // finding ref_v to use
                     for (int i = 0; i < sensor_fusion.size(); i++) {
-                        // to check car is in the same lane
+                        // check if car is in the same lane
                         float d = sensor_fusion[i][6];
                         if (d > (4*(lane+0)) && d < (4*(lane+1))) {
                             double vx = sensor_fusion[i][3];
@@ -271,7 +270,7 @@ int main() {
                                 too_close = true;
                             }
                         } else if (lane != 2 && d > (4*(lane+1)) && d < (4*(lane+2))) {
-                            // to check car in right lane
+                            // to check if car in the right lane
                             double vx = sensor_fusion[i][3];
                             double vy = sensor_fusion[i][4];
                             double check_speed = sqrt(vx*vx+vy*vy);
@@ -279,10 +278,10 @@ int main() {
                             check_car_s += ((double)prev_size*0.02*check_speed); 
                             
                             if ((check_car_s > (car_s - 20)) && (check_car_s < (car_s + 30))) {
-                                right = true;
+                                right_close = true;
                             }
                         } else if (lane != 0 && d > (4*(lane-1)) && d < (4*(lane+0))) {
-                            // to check car in left lane
+                            // to check if car in the left lane
                             double vx = sensor_fusion[i][3];
                             double vy = sensor_fusion[i][4];
                             double check_speed = sqrt(vx*vx+vy*vy);
@@ -290,7 +289,7 @@ int main() {
                             check_car_s += ((double)prev_size*0.02*check_speed); 
                             
                             if ((check_car_s > (car_s - 20)) && (check_car_s < (car_s + 30))) {
-                                left = true;
+                                left_close = true;
                             }
                         }
                     }
@@ -298,22 +297,22 @@ int main() {
                     if (too_close) {
                         ref_vel -= .224; // 0.5 mph
                         
-                        if (lane == 0 && not right) {
+                        if (lane == 0 && !right_close) {
                             lane = 1;
                         } else if (lane == 1) {
-                            if (not left) {
+                            if (!left_close) {
                                 lane = 0;
-                            } else if (not right) {
+                            } else if (!right_close) {
                                 lane = 2;
                             }
-                        } else if (lane == 2 && not left) {
+                        } else if (lane == 2 && !left_close) {
                             lane = 1;
                         }
                         
                     } else if (ref_vel < 49.5) {
                         ref_vel += .224;
                     }
-			
+
 			vector<double> ptsx;
 			vector<double> ptsy;
 			
